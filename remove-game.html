@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>脱防护服学习 - 生物安全防护训练系统</title>
+    <link rel="stylesheet" href="/microbiology_experiment/css/style.css">
+    <link rel="stylesheet" href="/microbiology_experiment/css/game.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1><i class="fas fa-user-minus"></i> 脱防护服规范学习</h1>
+            <div class="game-info">
+                <div class="step-indicator">步骤 <span id="current-step">1</span>/<span id="total-steps">10</span></div>
+                <div class="score">得分: <span id="score">0</span></div>
+                <div class="timer">
+                    <i class="fas fa-clock"></i>
+                    <span id="timer">00:00</span>
+                </div>
+            </div>
+        </header>
+        
+        <main class="game-content">
+            <div class="question-container">
+                <div class="question-header">
+                    <div class="step-title-icon">
+                        <span id="step-number">1</span>
+                    </div>
+                    <h2 id="question-title">第一步: 手卫生</h2>
+                </div>
+                
+                <p id="question-text">在开始脱下防护服时，第一步应该做什么？</p>
+                
+                <div id="options-container" class="options-container">
+                    <!-- 选项会通过JS动态生成 -->
+                </div>
+                
+                <div class="feedback" id="feedback">
+                    <!-- 反馈信息会通过JS动态生成 -->
+                </div>
+                
+                <div class="image-container" id="image-container">
+                    <!-- 正确时的图片会通过JS动态显示 -->
+                </div>
+                
+                <div class="navigation">
+                    <button id="prev-btn" class="nav-btn"><i class="fas fa-arrow-left"></i> 上一步</button>
+                    <button id="next-btn" class="nav-btn" disabled>下一步 <i class="fas fa-arrow-right"></i></button>
+                    <button id="home-btn" class="nav-btn home-btn"><i class="fas fa-home"></i> 返回首页</button>
+                    <button id="restart-btn" class="nav-btn restart-btn"><i class="fas fa-redo"></i> 重新开始</button>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <div class="progress-container">
+                    <h3><i class="fas fa-tasks"></i> 学习进度</h3>
+                    <div class="progress-steps">
+                        <!-- 步骤指示器会通过JS动态生成 -->
+                    </div>
+                </div>
+                
+                <div class="step-summary">
+                    <h3><i class="fas fa-clipboard-list"></i> 当前步骤要点</h3>
+                    <div class="step-tips" id="step-tips">
+                        <!-- 步骤要点会通过JS动态生成 -->
+                    </div>
+                </div>
+                
+                <div class="completion-message" id="completion-message">
+                    <!-- 完成所有步骤后的消息 -->
+                </div>
+            </div>
+        </main>
+        
+        <div class="keyboard-hint">
+            <p><i class="fas fa-keyboard"></i> 键盘快捷键：数字键1-4选择选项，左右箭头切换步骤</p>
+        </div>
+    </div>
+    
+    <script src="/microbiology_experiment/js/remove-game.js"></script>
+</body>
+</html>

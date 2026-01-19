@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生物安全防护训练系统</title>
+    <link rel="stylesheet" href="/microbiology_experiment/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-shield-virus"></i> 生物安全防护训练系统</h1>
+            <p class="subtitle">闯关式学习 - 掌握防护服穿脱与高压灭菌锅使用规范</p>
+        </header>
+        
+        <main>
+            <div class="modules-container">
+                <div class="module-card" id="wear-module">
+                    <div class="module-icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h2>穿防护服</h2>
+                    <p>学习正确穿戴防护服的步骤和要点，包含10个关键步骤。</p>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <p class="progress-text">进度: 0/10</p>
+                    <button class="start-btn" onclick="startGame('wear')">开始学习</button>
+                </div>
+                
+                <div class="module-card" id="remove-module">
+                    <div class="module-icon">
+                        <i class="fas fa-user-minus"></i>
+                    </div>
+                    <h2>脱防护服</h2>
+                    <p>学习安全脱下和处理防护服的流程，包含6个关键步骤。</p>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <p class="progress-text">进度: 0/6</p>
+                    <button class="start-btn" onclick="startGame('remove')">开始学习</button>
+                </div>
+                
+                <div class="module-card" id="autoclave-module">
+                    <div class="module-icon">
+                        <i class="fas fa-prescription-bottle-alt"></i>
+                    </div>
+                    <h2>高压灭菌锅使用</h2>
+                    <p>学习高压灭菌锅的安全操作流程，包含5个关键步骤。</p>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <p class="progress-text">进度: 0/5</p>
+                    <button class="start-btn" onclick="startGame('autoclave')">开始学习</button>
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <h3><i class="fas fa-info-circle"></i> 使用说明</h3>
+                <ul>
+                    <li>选择任一模块开始闯关学习</li>
+                    <li>每个步骤需要选择正确答案才能继续</li>
+                    <li>选择错误时，系统会提示并允许重新选择</li>
+                    <li>完成所有步骤后，系统会显示学习报告</li>
+                    <li>可以随时返回主页面选择其他模块</li>
+                </ul>
+            </div>
+        </main>
+        
+        <footer>
+            <p>生物安全防护训练系统 &copy; 2023 - 实验室安全培训</p>
+        </footer>
+    </div>
+    
+    <script src="/microbiology_experiment/js/main.js"></script>
+</body>
+</html>
