@@ -1,11 +1,11 @@
-// pcr-game.js - PCR测腺病毒模块
+// pcr-game.js - PCR测腺病毒模块（单选题版本）
 
 let pcrSteps = [];
 let currentStep = 1;
 let score = 0;
-let selectedOptions = []; // 存储多选题选中的选项ID
+let selectedOption = null;
 let answered = false;
-let userAnswers = []; // 存储每步的答案（对于多选题，存储选中的ID数组）
+let userAnswers = [];
 let totalSteps = 0;
 let startTime = Date.now();
 let timerInterval = null;
@@ -29,34 +29,29 @@ const restartBtn = document.getElementById('restart-btn');
 const progressStepsContainer = document.querySelector('.progress-steps');
 const completionMessage = document.getElementById('completion-message');
 const stepTips = document.getElementById('step-tips');
-const multiSelectHint = document.getElementById('multi-select-hint');
 
-// PCR测腺病毒步骤数据
+// PCR测腺病毒步骤数据（单选题版本）
 const pcrStepsData = [
     {
         step: 1,
-        title: "第一步: PCR反应体系配制",
-        question: "PCR反应体系需要哪些核心组分？请选择所有必需的成分（全选）。",
-        isMultiSelect: true, // 标记为多选题
-        correctIds: [1, 2, 3, 4, 5, 6], // 所有选项都是正确的（全选）
+        title: "第一步: PCR反应体系",
+        question: "PCR反应体系需要哪些核心组分？请选择最完整正确的选项。",
         options: [
-            { id: 1, text: "DNA模板", correct: true },
-            { id: 2, text: "引物（上下游）", correct: true },
-            { id: 3, text: "dNTP（四种脱氧核苷酸）", correct: true },
-            { id: 4, text: "Taq DNA聚合酶", correct: true },
-            { id: 5, text: "MIX缓冲液（含Mg²⁺等）", correct: true },
-            { id: 6, text: "无菌PCR反应管", correct: true }
+            { id: 1, text: "DNA模板和引物", correct: false },
+            { id: 2, text: "DNA模板、引物、dNTP", correct: false },
+            { id: 3, text: "DNA模板、引物、dNTP、Taq酶", correct: false },
+            { id: 4, text: "DNA模板、引物、dNTP、Taq酶、MIX缓冲液、PCR反应管", correct: true }
         ],
-        feedbackCorrect: "正确！完整的PCR反应体系必须包含：DNA模板、特异性引物、dNTP混合物、Taq DNA聚合酶、反应缓冲液（MIX）以及无菌PCR反应管。这些组分缺一不可，共同保证了PCR扩增的特异性和效率。",
-        feedbackIncorrect: "错误。完整的PCR反应体系应包括：DNA模板、上下游引物、dNTP混合物、Taq DNA聚合酶、反应缓冲液（含MgCl₂）和PCR反应管。请重新选择所有必需的组分。",
+        feedbackCorrect: "正确！完整的PCR反应体系必须包含：DNA模板、特异性引物、dNTP混合物、Taq DNA聚合酶、反应缓冲液（MIX）以及无菌PCR反应管。这些组分缺一不可。",
+        feedbackIncorrect: "错误。完整的PCR反应体系应包括：DNA模板、上下游引物、dNTP混合物、Taq DNA聚合酶、反应缓冲液（含MgCl₂）和PCR反应管。",
         image: "/microbiology_experiment/images/pcr/1.png",
         imageCaption: "PCR反应体系配制",
         tips: [
             "DNA模板：待扩增的靶序列DNA",
             "引物：特异性结合靶序列，决定扩增特异性",
-            "dNTP：四种脱氧核苷酸(dATP、dGTP、dCTP、dTTP)作为合成原料",
+            "dNTP：四种脱氧核苷酸作为合成原料",
             "Taq酶：耐热DNA聚合酶，催化DNA合成",
-            "MIX缓冲液：提供适宜的反应环境（pH、Mg²⁺等）",
+            "MIX缓冲液：提供适宜的反应环境",
             "PCR反应管：无菌、无酶污染的一次性耗材"
         ]
     },
@@ -64,14 +59,13 @@ const pcrStepsData = [
         step: 2,
         title: "第二步: PCR扩增程序",
         question: "PCR扩增的标准循环程序顺序是什么？请严格按照正确的顺序选择。",
-        isMultiSelect: false, // 单选题
         options: [
             { id: 1, text: "延伸 → 退火 → 变性", correct: false },
             { id: 2, text: "变性 → 退火 → 延伸", correct: true },
             { id: 3, text: "退火 → 变性 → 延伸", correct: false },
             { id: 4, text: "变性 → 延伸 → 退火", correct: false }
         ],
-        feedbackCorrect: "正确！PCR标准程序顺序：1.变性（95℃使DNA双链解离成单链）→ 2.退火（50-60℃引物与模板特异性结合）→ 3.延伸（72℃Taq酶从引物3'端合成新链）。循环25-35次后，目的片段可扩增数百万倍。",
+        feedbackCorrect: "正确！PCR标准程序顺序：1.变性（95℃使DNA双链解离）→ 2.退火（50-60℃引物与模板结合）→ 3.延伸（72℃Taq酶合成新链）。",
         feedbackIncorrect: "错误。正确的PCR扩增顺序是：变性（高温使DNA变性成单链）→ 退火（降温使引物与模板结合）→ 延伸（适温下DNA聚合酶延伸）。",
         image: "/microbiology_experiment/images/pcr/2.png",
         imageCaption: "PCR扩增程序曲线",
@@ -79,8 +73,7 @@ const pcrStepsData = [
             "变性：95℃ 30秒，DNA双链解开成单链",
             "退火：55℃ 30秒，引物与模板特异性结合",
             "延伸：72℃ 1分钟/kb，Taq酶从引物3'端合成新链",
-            "循环25-35次，可扩增数百万倍目标片段",
-            "最后72℃终延伸5-10分钟，确保产物完整"
+            "循环25-35次，可扩增数百万倍目标片段"
         ]
     }
 ];
@@ -90,11 +83,9 @@ function loadSteps() {
     try {
         console.log('正在加载PCR测腺病毒数据...');
         
-        // 显示加载状态
         optionsContainer.innerHTML = '<div class="loading">加载中...</div>';
         questionText.textContent = '正在加载学习内容...';
         
-        // 使用本地数据
         pcrSteps = pcrStepsData;
         console.log('成功加载数据，步骤数:', pcrSteps.length);
         
@@ -105,21 +96,15 @@ function loadSteps() {
         totalSteps = pcrSteps.length;
         totalStepsElement.textContent = totalSteps;
         
-        // 初始化用户答案数组（存储每步的答案，多选题存储ID数组）
         userAnswers = new Array(totalSteps).fill(null);
         
-        // 从本地存储加载进度
         loadFromLocalStorage();
-        
-        // 加载当前步骤
         loadStep(currentStep);
         updateProgressSteps();
         
-        // 启动计时器
         if (timerInterval) clearInterval(timerInterval);
         timerInterval = setInterval(updateTimer, 1000);
         
-        // 清除加载状态
         setTimeout(() => {
             questionText.textContent = '';
         }, 500);
@@ -149,7 +134,6 @@ function loadFromLocalStorage() {
     
     if (savedAnswers) {
         userAnswers = JSON.parse(savedAnswers);
-        // 确保数组长度匹配
         if (userAnswers.length !== totalSteps) {
             userAnswers = new Array(totalSteps).fill(null);
         }
@@ -164,45 +148,25 @@ function updateTimer() {
     timerElement.textContent = `${minutes}:${seconds}`;
 }
 
-// 检查多选题答案是否正确
-function checkMultiSelectAnswer(step, selectedIds) {
-    const correctIds = step.correctIds;
-    // 检查是否选择了所有正确选项，且没有多选或少选
-    if (selectedIds.length !== correctIds.length) return false;
-    // 检查每个选中的ID是否都在正确ID列表中
-    return selectedIds.every(id => correctIds.includes(id));
-}
-
 // 加载指定步骤
 function loadStep(stepNumber) {
     if (!pcrSteps || pcrSteps.length === 0) return;
     
-    // 重置重试次数和选中项
     retryCount = 0;
-    selectedOptions = [];
     
     const step = pcrSteps[stepNumber - 1];
     currentStep = stepNumber;
     currentStepElement.textContent = stepNumber;
     
-    // 显示/隐藏多选题提示
-    if (multiSelectHint) {
-        multiSelectHint.style.display = step.isMultiSelect ? 'block' : 'none';
-    }
-    
-    // 更新问题
     questionTitle.textContent = `步骤${stepNumber}: ${step.title}`;
     questionText.textContent = step.question;
     
-    // 更新步骤要点
     if (stepTips && step.tips) {
         stepTips.innerHTML = step.tips.map(tip => `<li>${tip}</li>`).join('');
     }
     
-    // 清除之前的选项
     optionsContainer.innerHTML = '';
     
-    // 添加新选项
     step.options.forEach((option, index) => {
         const optionElement = document.createElement('div');
         optionElement.className = 'option';
@@ -211,72 +175,39 @@ function loadStep(stepNumber) {
         optionElement.dataset.correct = option.correct;
         optionElement.dataset.option = String.fromCharCode(65 + index);
         
-        // 如果是多选题，添加多选样式
-        if (step.isMultiSelect) {
-            optionElement.classList.add('multi-select-option');
-        }
-        
-        // 如果之前已回答正确，显示答案状态
         if (userAnswers[stepNumber - 1] !== null) {
-            const savedAnswer = userAnswers[stepNumber - 1];
-            const isCorrectAnswer = step.isMultiSelect ? 
-                checkMultiSelectAnswer(step, savedAnswer) : 
-                (step.options.find(o => o.id === savedAnswer)?.correct || false);
+            const selectedId = userAnswers[stepNumber - 1];
+            const selectedOptionData = step.options.find(o => o.id === selectedId);
             
-            if (isCorrectAnswer) {
-                // 之前回答正确的
-                if (step.isMultiSelect) {
-                    if (savedAnswer.includes(option.id)) {
-                        optionElement.classList.add('selected', 'correct');
-                    } else if (option.correct) {
-                        optionElement.classList.add('correct');
-                    }
-                } else {
-                    if (savedAnswer === option.id) {
-                        optionElement.classList.add('selected', 'correct');
-                    } else if (option.correct) {
-                        optionElement.classList.add('correct');
-                    }
+            if (selectedOptionData && selectedOptionData.correct) {
+                if (selectedId === option.id) {
+                    optionElement.classList.add('selected', 'correct');
+                } else if (option.correct) {
+                    optionElement.classList.add('correct');
                 }
                 optionElement.classList.add('disabled');
             } else {
-                // 之前回答错误的，显示错误状态但允许重新选择
-                if (step.isMultiSelect) {
-                    if (savedAnswer.includes(option.id)) {
-                        optionElement.classList.add('selected', 'incorrect');
-                    }
-                } else {
-                    if (savedAnswer === option.id) {
-                        optionElement.classList.add('selected', 'incorrect');
-                    }
+                if (selectedId === option.id) {
+                    optionElement.classList.add('selected', 'incorrect');
                 }
             }
         }
         
-        // 添加点击事件
-        if (step.isMultiSelect) {
-            optionElement.addEventListener('click', () => selectMultiOption(optionElement, step));
-        } else {
-            optionElement.addEventListener('click', () => selectSingleOption(optionElement, step));
-        }
+        optionElement.addEventListener('click', () => selectOption(optionElement));
         optionsContainer.appendChild(optionElement);
     });
     
-    // 重置反馈和图片
     feedback.className = 'feedback';
     feedback.style.display = 'none';
     feedback.innerHTML = '';
     imageContainer.style.display = 'none';
     imageContainer.innerHTML = '';
     
-    // 如果之前已回答正确，显示反馈和图片
     if (userAnswers[stepNumber - 1] !== null) {
-        const savedAnswer = userAnswers[stepNumber - 1];
-        const isCorrectAnswer = step.isMultiSelect ? 
-            checkMultiSelectAnswer(step, savedAnswer) : 
-            (step.options.find(o => o.id === savedAnswer)?.correct || false);
+        const selectedId = userAnswers[stepNumber - 1];
+        const selectedOption = step.options.find(o => o.id === selectedId);
         
-        if (isCorrectAnswer) {
+        if (selectedOption && selectedOption.correct) {
             feedback.className = 'feedback correct';
             feedback.textContent = step.feedbackCorrect;
             feedback.style.display = 'block';
@@ -292,330 +223,122 @@ function loadStep(stepNumber) {
             nextBtn.disabled = false;
             answered = true;
         } else {
-            // 之前回答错误的，不显示反馈，允许重新作答
             prevBtn.disabled = stepNumber === 1;
             nextBtn.disabled = true;
             answered = false;
+            selectedOption = null;
         }
     } else {
-        // 更新按钮状态
         prevBtn.disabled = stepNumber === 1;
         nextBtn.disabled = true;
         answered = false;
+        selectedOption = null;
     }
     
-    // 更新进度指示器
     updateProgressSteps();
     
-    // 如果是最后一步且已答完，显示完成消息
     if (stepNumber === totalSteps && userAnswers[stepNumber - 1] !== null) {
-        const savedAnswer = userAnswers[stepNumber - 1];
-        const isCorrectAnswer = step.isMultiSelect ? 
-            checkMultiSelectAnswer(step, savedAnswer) : 
-            (step.options.find(o => o.id === savedAnswer)?.correct || false);
-        
-        if (isCorrectAnswer) {
+        const selectedId = userAnswers[stepNumber - 1];
+        const selectedOptionData = step.options.find(o => o.id === selectedId);
+        if (selectedOptionData && selectedOptionData.correct) {
             setTimeout(showCompletionMessage, 500);
         }
     }
 }
 
-// 多选题选择逻辑
-function selectMultiOption(optionElement, step) {
+// 选择选项
+function selectOption(optionElement) {
     if (answered && optionElement.classList.contains('disabled')) return;
     
-    const optionId = parseInt(optionElement.dataset.id);
-    const index = selectedOptions.indexOf(optionId);
-    
-    if (index === -1) {
-        // 未选中，添加选中
-        selectedOptions.push(optionId);
-        optionElement.classList.add('selected');
-    } else {
-        // 已选中，取消选中
-        selectedOptions.splice(index, 1);
-        optionElement.classList.remove('selected');
-    }
-    
-    // 移除所有错误样式
-    document.querySelectorAll('.option').forEach(opt => {
-        opt.classList.remove('incorrect');
-    });
-    
-    // 隐藏之前的反馈
-    feedback.style.display = 'none';
-}
-
-// 单选题选择逻辑
-function selectSingleOption(optionElement, step) {
-    if (answered && optionElement.classList.contains('disabled')) return;
-    
-    // 移除之前的选择
     document.querySelectorAll('.option').forEach(opt => {
         opt.classList.remove('selected');
     });
     
-    // 标记当前选择
     optionElement.classList.add('selected');
+    selectedOption = optionElement;
     
     const optionId = parseInt(optionElement.dataset.id);
+    const step = pcrSteps[currentStep - 1];
     const option = step.options.find(o => o.id === optionId);
     const isCorrect = option ? option.correct : false;
     
     if (isCorrect) {
-        handleCorrectAnswer(step, optionId);
-    } else {
-        handleIncorrectAnswer(step, optionId, optionElement);
-    }
-}
-
-// 处理正确答案
-function handleCorrectAnswer(step, optionId) {
-    // 清除可能存在的重新作答按钮
-    const retryBtn = document.getElementById('retry-btn');
-    if (retryBtn) retryBtn.remove();
-    
-    // 保存用户答案
-    userAnswers[currentStep - 1] = optionId;
-    localStorage.setItem('pcrAnswers', JSON.stringify(userAnswers));
-    
-    // 显示反馈
-    feedback.className = 'feedback correct';
-    feedback.textContent = step.feedbackCorrect;
-    feedback.style.display = 'block';
-    
-    // 显示图片
-    if (step.image) {
-        imageContainer.innerHTML = `
-            <img src="${step.image}" alt="${step.imageCaption || '步骤图片'}" class="step-image">
-            <p class="image-caption">${step.imageCaption || ''}</p>
-        `;
-        imageContainer.style.display = 'block';
-    }
-    
-    // 显示正确答案
-    document.querySelectorAll('.option').forEach(opt => {
-        if (opt.dataset.correct === 'true') {
-            opt.classList.add('correct');
-        }
-        opt.classList.add('disabled');
-    });
-    
-    // 更新得分（每步50分，总分100）
-    score += 50;
-    scoreElement.textContent = score;
-    scoreElement.classList.add('score-increase');
-    setTimeout(() => {
-        scoreElement.classList.remove('score-increase');
-    }, 500);
-    
-    localStorage.setItem('pcrScore', score);
-    localStorage.setItem('pcrProgress', currentStep);
-    
-    // 禁用所有选项
-    document.querySelectorAll('.option').forEach(opt => {
-        opt.classList.add('disabled');
-    });
-    
-    // 标记进度步骤为完成
-    const progressStep = document.querySelector(`.progress-step[data-step="${currentStep}"]`);
-    if (progressStep) progressStep.classList.add('completed');
-    
-    // 启用下一步按钮
-    nextBtn.disabled = false;
-    answered = true;
-    
-    // 如果是最后一步，显示完成消息
-    if (currentStep === totalSteps) {
-        setTimeout(showCompletionMessage, 500);
-    }
-}
-
-// 处理多选题正确答案
-function handleMultiCorrectAnswer(step) {
-    // 清除可能存在的重新作答按钮
-    const retryBtn = document.getElementById('retry-btn');
-    if (retryBtn) retryBtn.remove();
-    
-    // 保存用户答案（选中的ID数组）
-    userAnswers[currentStep - 1] = [...selectedOptions];
-    localStorage.setItem('pcrAnswers', JSON.stringify(userAnswers));
-    
-    // 显示反馈
-    feedback.className = 'feedback correct';
-    feedback.textContent = step.feedbackCorrect;
-    feedback.style.display = 'block';
-    
-    // 显示图片
-    if (step.image) {
-        imageContainer.innerHTML = `
-            <img src="${step.image}" alt="${step.imageCaption || '步骤图片'}" class="step-image">
-            <p class="image-caption">${step.imageCaption || ''}</p>
-        `;
-        imageContainer.style.display = 'block';
-    }
-    
-    // 显示所有正确答案
-    document.querySelectorAll('.option').forEach(opt => {
-        if (opt.dataset.correct === 'true') {
-            opt.classList.add('correct');
-        }
-        opt.classList.add('disabled');
-    });
-    
-    // 更新得分
-    score += 50;
-    scoreElement.textContent = score;
-    scoreElement.classList.add('score-increase');
-    setTimeout(() => {
-        scoreElement.classList.remove('score-increase');
-    }, 500);
-    
-    localStorage.setItem('pcrScore', score);
-    localStorage.setItem('pcrProgress', currentStep);
-    
-    // 标记进度步骤为完成
-    const progressStep = document.querySelector(`.progress-step[data-step="${currentStep}"]`);
-    if (progressStep) progressStep.classList.add('completed');
-    
-    // 启用下一步按钮
-    nextBtn.disabled = false;
-    answered = true;
-    
-    // 如果是最后一步，显示完成消息
-    if (currentStep === totalSteps) {
-        setTimeout(showCompletionMessage, 500);
-    }
-}
-
-// 处理错误答案
-function handleIncorrectAnswer(step, optionId, optionElement) {
-    retryCount++;
-    
-    // 显示反馈
-    feedback.className = 'feedback incorrect';
-    
-    if (retryCount >= MAX_RETRIES) {
-        // 达到最大重试次数，显示正确答案
-        document.querySelectorAll('.option').forEach(opt => {
-            if (opt.dataset.correct === 'true') {
-                opt.classList.add('correct');
-            }
-            opt.classList.add('disabled');
-        });
+        const retryBtn = document.getElementById('retry-btn');
+        if (retryBtn) retryBtn.remove();
         
-        feedback.textContent = `${step.feedbackIncorrect}\n\n您已尝试 ${MAX_RETRIES} 次，正确答案已显示。`;
-        
-        // 保存错误答案
         userAnswers[currentStep - 1] = optionId;
         localStorage.setItem('pcrAnswers', JSON.stringify(userAnswers));
         
-        // 启用下一步按钮
-        nextBtn.disabled = false;
-        answered = true;
-    } else {
-        // 还可以重试
-        feedback.textContent = `${step.feedbackIncorrect}\n\n请重新选择正确答案 (剩余尝试次数: ${MAX_RETRIES - retryCount})`;
-        
-        // 添加重新作答按钮
-        addRetryButton();
-        
-        // 标记错误选项
-        optionElement.classList.add('incorrect');
-        
-        // 保存临时答案
-        userAnswers[currentStep - 1] = optionId;
-    }
-    
-    feedback.style.display = 'block';
-}
-
-// 处理多选题错误答案
-function handleMultiIncorrectAnswer(step) {
-    retryCount++;
-    
-    // 显示反馈
-    feedback.className = 'feedback incorrect';
-    
-    if (retryCount >= MAX_RETRIES) {
-        // 达到最大重试次数，显示所有正确答案
-        document.querySelectorAll('.option').forEach(opt => {
-            if (opt.dataset.correct === 'true') {
-                opt.classList.add('correct');
-            }
-            opt.classList.add('disabled');
-        });
-        
-        feedback.textContent = `${step.feedbackIncorrect}\n\n您已尝试 ${MAX_RETRIES} 次，正确答案已显示。`;
-        
-        // 保存错误答案
-        userAnswers[currentStep - 1] = [...selectedOptions];
-        localStorage.setItem('pcrAnswers', JSON.stringify(userAnswers));
-        
-        // 启用下一步按钮
-        nextBtn.disabled = false;
-        answered = true;
-    } else {
-        // 还可以重试
-        feedback.textContent = `${step.feedbackIncorrect}\n\n请重新选择所有正确答案 (剩余尝试次数: ${MAX_RETRIES - retryCount})`;
-        
-        // 添加重新作答按钮
-        addRetryButton();
-        
-        // 标记错误选项（选中的标记为红色）
-        document.querySelectorAll('.option.selected').forEach(opt => {
-            if (opt.dataset.correct !== 'true') {
-                opt.classList.add('incorrect');
-            }
-        });
-        
-        // 保存临时答案
-        userAnswers[currentStep - 1] = [...selectedOptions];
-    }
-    
-    feedback.style.display = 'block';
-}
-
-// 提交多选题答案
-function submitMultiAnswer(step) {
-    if (answered) return;
-    
-    if (selectedOptions.length === 0) {
-        // 未选择任何选项
-        feedback.className = 'feedback incorrect';
-        feedback.textContent = '请至少选择一个选项。';
+        feedback.className = 'feedback correct';
+        feedback.textContent = step.feedbackCorrect;
         feedback.style.display = 'block';
-        return;
-    }
-    
-    const isCorrect = checkMultiSelectAnswer(step, selectedOptions);
-    
-    if (isCorrect) {
-        handleMultiCorrectAnswer(step);
+        
+        if (step.image) {
+            imageContainer.innerHTML = `
+                <img src="${step.image}" alt="${step.imageCaption || '步骤图片'}" class="step-image">
+                <p class="image-caption">${step.imageCaption || ''}</p>
+            `;
+            imageContainer.style.display = 'block';
+        }
+        
+        document.querySelectorAll('.option').forEach(opt => {
+            if (opt.dataset.correct === 'true') {
+                opt.classList.add('correct');
+            }
+        });
+        
+        score += 50;
+        scoreElement.textContent = score;
+        scoreElement.classList.add('score-increase');
+        setTimeout(() => {
+            scoreElement.classList.remove('score-increase');
+        }, 500);
+        
+        localStorage.setItem('pcrScore', score);
+        localStorage.setItem('pcrProgress', currentStep);
+        
+        document.querySelectorAll('.option').forEach(opt => {
+            opt.classList.add('disabled');
+        });
+        
+        const progressStep = document.querySelector(`.progress-step[data-step="${currentStep}"]`);
+        if (progressStep) progressStep.classList.add('completed');
+        
+        nextBtn.disabled = false;
+        answered = true;
+        
+        if (currentStep === totalSteps) {
+            setTimeout(showCompletionMessage, 500);
+        }
     } else {
-        handleMultiIncorrectAnswer(step);
+        retryCount++;
+        
+        feedback.className = 'feedback incorrect';
+        
+        if (retryCount >= MAX_RETRIES) {
+            document.querySelectorAll('.option').forEach(opt => {
+                if (opt.dataset.correct === 'true') {
+                    opt.classList.add('correct');
+                }
+                opt.classList.add('disabled');
+            });
+            
+            feedback.textContent = `${step.feedbackIncorrect}\n\n您已尝试 ${MAX_RETRIES} 次，正确答案已显示。`;
+            
+            userAnswers[currentStep - 1] = optionId;
+            localStorage.setItem('pcrAnswers', JSON.stringify(userAnswers));
+            
+            nextBtn.disabled = false;
+            answered = true;
+        } else {
+            feedback.textContent = `${step.feedbackIncorrect}\n\n请重新选择正确答案 (剩余尝试次数: ${MAX_RETRIES - retryCount})`;
+            addRetryButton();
+            optionElement.classList.add('incorrect');
+            userAnswers[currentStep - 1] = optionId;
+        }
+        
+        feedback.style.display = 'block';
     }
-}
-
-// 添加提交按钮（用于多选题）
-function addSubmitButton(step) {
-    // 检查是否已存在提交按钮
-    if (document.getElementById('submit-btn')) return;
-    
-    // 创建提交按钮
-    const submitBtn = document.createElement('button');
-    submitBtn.id = 'submit-btn';
-    submitBtn.className = 'nav-btn';
-    submitBtn.innerHTML = '<i class="fas fa-check"></i> 提交答案';
-    submitBtn.style.marginTop = '15px';
-    submitBtn.style.marginRight = '10px';
-    submitBtn.style.backgroundColor = '#9b59b6';
-    
-    // 添加到反馈区域
-    feedback.parentNode.insertBefore(submitBtn, feedback.nextSibling);
-    
-    // 添加点击事件
-    submitBtn.addEventListener('click', () => submitMultiAnswer(step));
 }
 
 // 添加重新作答按钮
@@ -630,36 +353,28 @@ function addRetryButton() {
     retryBtn.style.marginRight = '10px';
     
     feedback.appendChild(retryBtn);
-    
     retryBtn.addEventListener('click', retryQuestion);
 }
 
 // 重新作答函数
 function retryQuestion() {
-    // 移除重新作答按钮
     const retryBtn = document.getElementById('retry-btn');
     if (retryBtn) retryBtn.remove();
     
-    // 清除反馈
     feedback.className = 'feedback';
     feedback.style.display = 'none';
     feedback.innerHTML = '';
     
-    // 隐藏图片
     imageContainer.style.display = 'none';
     imageContainer.innerHTML = '';
     
-    // 重置选项状态
     document.querySelectorAll('.option').forEach(opt => {
         opt.classList.remove('selected', 'correct', 'incorrect', 'disabled');
     });
     
-    // 重置游戏状态
-    selectedOptions = [];
+    selectedOption = null;
     answered = false;
     nextBtn.disabled = true;
-    
-    // 清除当前步骤的答案
     userAnswers[currentStep - 1] = null;
 }
 
@@ -674,13 +389,10 @@ function updateProgressSteps() {
         stepElement.className = 'progress-step';
         if (step.step === currentStep) stepElement.classList.add('active');
         
-        // 检查这一步是否已回答正确
         if (userAnswers[step.step - 1] !== null) {
-            const savedAnswer = userAnswers[step.step - 1];
-            const isCorrect = step.isMultiSelect ? 
-                checkMultiSelectAnswer(step, savedAnswer) : 
-                (step.options.find(o => o.id === savedAnswer)?.correct || false);
-            if (isCorrect) {
+            const selectedId = userAnswers[step.step - 1];
+            const selectedOption = step.options.find(o => o.id === selectedId);
+            if (selectedOption && selectedOption.correct) {
                 stepElement.classList.add('completed');
             }
         }
@@ -693,11 +405,9 @@ function updateProgressSteps() {
         `;
         
         stepElement.addEventListener('click', () => {
-            const savedAnswer = userAnswers[step.step - 1];
-            const isCorrect = savedAnswer !== null ? 
-                (step.isMultiSelect ? 
-                    checkMultiSelectAnswer(step, savedAnswer) : 
-                    (step.options.find(o => o.id === savedAnswer)?.correct || false)) : false;
+            const selectedId = userAnswers[step.step - 1];
+            const selectedOption = step.options.find(o => o.id === selectedId);
+            const isCorrect = selectedOption ? selectedOption.correct : false;
             
             if (step.step <= currentStep || isCorrect) {
                 loadStep(step.step);
@@ -753,7 +463,6 @@ function restartGame() {
     userAnswers = new Array(totalSteps).fill(null);
     startTime = Date.now();
     retryCount = 0;
-    selectedOptions = [];
     
     localStorage.removeItem('pcrProgress');
     localStorage.removeItem('pcrScore');
@@ -780,13 +489,10 @@ nextBtn.addEventListener('click', () => {
         loadStep(currentStep + 1);
     } else {
         if (userAnswers[currentStep - 1] !== null) {
-            const step = pcrSteps[currentStep - 1];
-            const savedAnswer = userAnswers[currentStep - 1];
-            const isCorrect = step.isMultiSelect ? 
-                checkMultiSelectAnswer(step, savedAnswer) : 
-                (step.options.find(o => o.id === savedAnswer)?.correct || false);
-            
-            if (isCorrect) {
+            const selectedId = userAnswers[currentStep - 1];
+            const stepData = pcrSteps[currentStep - 1];
+            const selectedOption = stepData.options.find(o => o.id === selectedId);
+            if (selectedOption && selectedOption.correct) {
                 showCompletionMessage();
             }
         }
@@ -807,28 +513,11 @@ document.addEventListener('keydown', (e) => {
         prevBtn.click();
     } else if (e.key === 'ArrowRight' && !nextBtn.disabled) {
         nextBtn.click();
-    } else if (e.key >= '1' && e.key <= '6' && !answered) {
-        const step = pcrSteps[currentStep - 1];
-        if (step && step.isMultiSelect) {
-            // 多选题：数字键1-6选择/取消选择选项
-            const options = document.querySelectorAll('.option:not(.disabled)');
-            const index = parseInt(e.key) - 1;
-            if (index < options.length) {
-                options[index].click();
-            }
-        } else if (step && !step.isMultiSelect && e.key >= '1' && e.key <= '4') {
-            // 单选题：数字键1-4直接选择
-            const options = document.querySelectorAll('.option:not(.disabled)');
-            const index = parseInt(e.key) - 1;
-            if (index < options.length) {
-                options[index].click();
-            }
-        }
-    } else if (e.key === 'Enter' && !answered) {
-        // Enter键提交多选题答案
-        const step = pcrSteps[currentStep - 1];
-        if (step && step.isMultiSelect && selectedOptions.length > 0) {
-            submitMultiAnswer(step);
+    } else if (e.key >= '1' && e.key <= '4' && !answered) {
+        const options = document.querySelectorAll('.option:not(.disabled)');
+        const index = parseInt(e.key) - 1;
+        if (index < options.length) {
+            options[index].click();
         }
     } else if (e.key === 'r' || e.key === 'R') {
         const retryBtn = document.getElementById('retry-btn');
