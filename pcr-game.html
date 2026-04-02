@@ -27,20 +27,6 @@
         .step-tips li:before {
             color: #9b59b6;
         }
-        /* PCR特有的多选提示样式 */
-        .multi-select-hint {
-            background-color: #f8f9fa;
-            border-left: 4px solid #9b59b6;
-            padding: 10px 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-        .multi-select-hint i {
-            color: #9b59b6;
-            margin-right: 8px;
-        }
     </style>
 </head>
 <body>
@@ -63,14 +49,10 @@
                     <div class="step-title-icon">
                         <span id="step-number">1</span>
                     </div>
-                    <h2 id="question-title">步骤1: PCR反应体系配制</h2>
+                    <h2 id="question-title">步骤1: PCR反应体系</h2>
                 </div>
                 
-                <div id="multi-select-hint" class="multi-select-hint" style="display: none;">
-                    <i class="fas fa-info-circle"></i> 本题为多选题，需要选择所有正确的选项
-                </div>
-                
-                <p id="question-text">PCR反应体系需要哪些核心组分？请选择所有必需的成分（全选）。</p>
+                <p id="question-text">PCR反应体系需要哪些核心组分？请选择最完整正确的选项。</p>
                 
                 <div id="options-container" class="options-container">
                     <!-- 选项会通过JS动态生成 -->
@@ -114,7 +96,7 @@
         </main>
         
         <div class="keyboard-hint">
-            <p><i class="fas fa-keyboard"></i> 键盘快捷键：数字键1-4选择选项，左右箭头切换步骤</p>
+            <p><i class="fas fa-keyboard"></i> 键盘快捷键：数字键1-4选择选项，左右箭头切换步骤，R键重新作答，H键返回首页</p>
         </div>
     </div>
     
