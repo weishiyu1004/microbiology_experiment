@@ -6,16 +6,44 @@
     <title>生物安全防护训练系统</title>
     <link rel="stylesheet" href="/microbiology_experiment/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 为6个模块优化网格布局 */
+        .modules-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        @media (max-width: 768px) {
+            .modules-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .module-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .module-card:hover {
+            transform: translateY(-8px);
+        }
+        /* 为不同模块设置不同的顶部边框颜色 */
+        #wear-module { border-top-color: #3498db; }
+        #remove-module { border-top-color: #e74c3c; }
+        #autoclave-module { border-top-color: #2ecc71; }
+        #chorio-module { border-top-color: #f39c12; }
+        #pcr-module { border-top-color: #9b59b6; }
+        #cell-module { border-top-color: #1abc9c; }
+    </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1><i class="fas fa-shield-virus"></i> 生物安全防护训练系统</h1>
-            <p class="subtitle">闯关式学习 - 掌握防护服穿脱与高压灭菌锅使用规范</p>
+            <p class="subtitle">闯关式学习 - 掌握实验室核心操作规范</p>
         </header>
         
         <main>
             <div class="modules-container">
+                <!-- 模块1: 穿防护服 -->
                 <div class="module-card" id="wear-module">
                     <div class="module-icon">
                         <i class="fas fa-user-md"></i>
@@ -29,47 +57,92 @@
                     <button class="start-btn" onclick="startGame('wear')">开始学习</button>
                 </div>
                 
+                <!-- 模块2: 脱防护服 -->
                 <div class="module-card" id="remove-module">
                     <div class="module-icon">
                         <i class="fas fa-user-minus"></i>
                     </div>
                     <h2>脱防护服</h2>
-                    <p>学习安全脱下和处理防护服的流程，包含6个关键步骤。</p>
+                    <p>学习安全脱下和处理防护服的流程，包含10个关键步骤。</p>
                     <div class="progress">
                         <div class="progress-bar" style="width: 0%"></div>
                     </div>
-                    <p class="progress-text">进度: 0/6</p>
+                    <p class="progress-text">进度: 0/10</p>
                     <button class="start-btn" onclick="startGame('remove')">开始学习</button>
                 </div>
                 
+                <!-- 模块3: 高压灭菌锅使用 -->
                 <div class="module-card" id="autoclave-module">
                     <div class="module-icon">
                         <i class="fas fa-prescription-bottle-alt"></i>
                     </div>
                     <h2>高压灭菌锅使用</h2>
-                    <p>学习高压灭菌锅的安全操作流程，包含5个关键步骤。</p>
+                    <p>学习高压灭菌锅的安全操作流程，包含6个关键步骤。</p>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <p class="progress-text">进度: 0/6</p>
+                    <button class="start-btn" onclick="startGame('autoclave')">开始学习</button>
+                </div>
+                
+                <!-- 模块4: 鸡胚尿囊腔接种 (新增) -->
+                <div class="module-card" id="chorio-module">
+                    <div class="module-icon">
+                        <i class="fas fa-egg"></i>
+                    </div>
+                    <h2>鸡胚尿囊腔接种</h2>
+                    <p>学习鸡胚接种病毒的操作规范，包含6个关键步骤：检卵、标记、消毒、锥孔、接种、封孔。</p>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <p class="progress-text">进度: 0/6</p>
+                    <button class="start-btn" onclick="startGame('chorio')">开始学习</button>
+                </div>
+                
+                <!-- 模块5: PCR测腺病毒 (新增) -->
+                <div class="module-card" id="pcr-module">
+                    <div class="module-icon">
+                        <i class="fas fa-dna"></i>
+                    </div>
+                    <h2>PCR测腺病毒</h2>
+                    <p>学习PCR反应体系配制和扩增程序，包含2大核心环节（反应体系+扩增程序）。</p>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <p class="progress-text">进度: 0/2</p>
+                    <button class="start-btn" onclick="startGame('pcr')">开始学习</button>
+                </div>
+                
+                <!-- 模块6: 传代细胞培养 (新增) -->
+                <div class="module-card" id="cell-module">
+                    <div class="module-icon">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <h2>传代细胞培养</h2>
+                    <p>学习细胞传代培养的操作流程，包含5个关键步骤：洗涤、消化、中和、分装、培养。</p>
                     <div class="progress">
                         <div class="progress-bar" style="width: 0%"></div>
                     </div>
                     <p class="progress-text">进度: 0/5</p>
-                    <button class="start-btn" onclick="startGame('autoclave')">开始学习</button>
+                    <button class="start-btn" onclick="startGame('cell')">开始学习</button>
                 </div>
             </div>
             
             <div class="instructions">
                 <h3><i class="fas fa-info-circle"></i> 使用说明</h3>
                 <ul>
-                    <li>选择任一模块开始闯关学习</li>
+                    <li>选择任一模块开始闯关学习，共6个模块</li>
                     <li>每个步骤需要选择正确答案才能继续</li>
-                    <li>选择错误时，系统会提示并允许重新选择</li>
-                    <li>完成所有步骤后，系统会显示学习报告</li>
-                    <li>可以随时返回主页面选择其他模块</li>
+                    <li>选择错误时，系统会提示并允许重新选择（最多2次重试）</li>
+                    <li>完成所有步骤后，系统会显示学习报告和得分</li>
+                    <li>可以随时返回主页面选择其他模块，进度会自动保存</li>
+                    <li>键盘快捷键：数字键1-4选择选项，左右箭头切换步骤，R键重新作答，H键返回首页</li>
                 </ul>
             </div>
         </main>
         
         <footer>
-            <p>生物安全防护训练系统 &copy; 2023 - 实验室安全培训</p>
+            <p>生物安全防护训练系统 &copy; 2026 - 实验室安全培训 | 包含6大核心模块</p>
         </footer>
     </div>
     
