@@ -575,7 +575,7 @@ function showCompletionMessage() {
         <p>您已成功完成传代细胞培养的所有学习步骤。</p>
          <!-- 添加流程图 -->
     <div style="margin: 15px 0; text-align: center;">
-        <img src="/microbiology_experiment/images/wear/cell.png" alt="传代细胞流程图" style="max-width: 100%; border-radius: 10px;">
+        <img src="/microbiology_experiment/images/cell/cell.png" alt="传代细胞流程图" style="max-width: 100%; border-radius: 10px;">
     </div>
         <p>最终得分: <strong>${score}</strong>/100</p>
         <p>用时: <strong>${minutes}分${seconds}秒</strong></p>
