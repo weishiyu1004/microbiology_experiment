@@ -123,7 +123,7 @@ const chorioStepsData = [
         options: [
             { id: 1, text: "用注射器将病毒液直接注入气室", correct: false },
             { id: 2, text: "将病毒滴在蛋壳表面", correct: false },
-            { id: 3, text: "接种", correct: true },
+            { id: 3, text: "将注射器沿锥孔垂直插入约1cm，注射0.2mL", correct: true },
             { id: 4, text: "直接打开蛋壳倒灌病毒液", correct: false }
         ],
         feedbackCorrect: "正确！接种时针头沿锥孔刺入尿囊腔，缓慢注入病毒液，拔出后轻压孔口防止漏液。",
