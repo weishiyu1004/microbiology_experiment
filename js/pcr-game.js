@@ -10,7 +10,7 @@ let totalSteps = 0;
 let startTime = Date.now();
 let timerInterval = null;
 let retryCount = 0;
-const MAX_RETRIES = 2;
+const MAX_RETRIES = 3;
 
 // DOM元素
 const questionTitle = document.getElementById('question-title');
@@ -310,35 +310,40 @@ function selectOption(optionElement) {
         if (currentStep === totalSteps) {
             setTimeout(showCompletionMessage, 500);
         }
+   } else {
+    // 答错逻辑
+    retryCount++;
+    
+    feedback.className = 'feedback incorrect';
+    
+    if (retryCount >= MAX_RETRIES) {
+        // 第3次仍答错，显示正确答案
+        document.querySelectorAll('.option').forEach(opt => {
+            if (opt.dataset.correct === 'true') {
+                opt.classList.add('correct');
+            }
+            opt.classList.add('disabled');
+        });
+        
+        feedback.textContent = `${step.feedbackIncorrect}\n\n您已尝试 ${MAX_RETRIES} 次，正确答案已显示。`;
+        
+        userAnswers[currentStep - 1] = optionId;
+        localStorage.setItem('wearAnswers', JSON.stringify(userAnswers));
+        
+        nextBtn.disabled = false;
+        answered = true;
     } else {
-        retryCount++;
+        // 前2次答错：只提示错误，不显示答案
+        const remainingTries = MAX_RETRIES - retryCount;
+        feedback.textContent = `❌ 回答错误！请重新选择正确答案。 (剩余尝试次数: ${remainingTries})`;
         
-        feedback.className = 'feedback incorrect';
-        
-        if (retryCount >= MAX_RETRIES) {
-            document.querySelectorAll('.option').forEach(opt => {
-                if (opt.dataset.correct === 'true') {
-                    opt.classList.add('correct');
-                }
-                opt.classList.add('disabled');
-            });
-            
-            feedback.textContent = `${step.feedbackIncorrect}\n\n您已尝试 ${MAX_RETRIES} 次，正确答案已显示。`;
-            
-            userAnswers[currentStep - 1] = optionId;
-            localStorage.setItem('pcrAnswers', JSON.stringify(userAnswers));
-            
-            nextBtn.disabled = false;
-            answered = true;
-        } else {
-            feedback.textContent = `${step.feedbackIncorrect}\n\n请重新选择正确答案 (剩余尝试次数: ${MAX_RETRIES - retryCount})`;
-            addRetryButton();
-            optionElement.classList.add('incorrect');
-            userAnswers[currentStep - 1] = optionId;
-        }
-        
-        feedback.style.display = 'block';
+        addRetryButton();
+        optionElement.classList.add('incorrect');
+        userAnswers[currentStep - 1] = optionId;
     }
+    
+    feedback.style.display = 'block';
+}
 }
 
 // 添加重新作答按钮
@@ -433,6 +438,10 @@ function showCompletionMessage() {
     completionMessage.innerHTML = `
         <h3><i class="fas fa-trophy"></i> 恭喜完成！</h3>
         <p>您已成功完成PCR测腺病毒的所有学习步骤。</p>
+         <!-- 添加流程图 -->
+    <div style="margin: 15px 0; text-align: center;">
+        <img src="/microbiology_experiment/images/wear/pcr.png" alt="pcr流程图" style="max-width: 100%; border-radius: 10px;">
+    </div>
         <p>最终得分: <strong>${score}</strong>/100</p>
         <p>用时: <strong>${minutes}分${seconds}秒</strong></p>
         <p>您已掌握PCR反应体系和扩增程序的关键要点。</p>

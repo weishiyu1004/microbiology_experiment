@@ -9,7 +9,7 @@ let totalSteps = 0;
 let startTime = Date.now();
 let timerInterval = null;
 let retryCount = 0;
-const MAX_RETRIES = 2;
+const MAX_RETRIES = 3;
 
 // DOM元素
 const questionTitle = document.getElementById('question-title');
@@ -472,50 +472,39 @@ function selectOption(optionElement) {
             setTimeout(showCompletionMessage, 500);
         }
     } else {
-        // 答错逻辑
-        retryCount++;
+    // 答错逻辑
+    retryCount++;
+    
+    feedback.className = 'feedback incorrect';
+    
+    if (retryCount >= MAX_RETRIES) {
+        // 第3次仍答错，显示正确答案
+        document.querySelectorAll('.option').forEach(opt => {
+            if (opt.dataset.correct === 'true') {
+                opt.classList.add('correct');
+            }
+            opt.classList.add('disabled');
+        });
         
-        // 显示反馈
-        feedback.className = 'feedback incorrect';
+        feedback.textContent = `${step.feedbackIncorrect}\n\n您已尝试 ${MAX_RETRIES} 次，正确答案已显示。`;
         
-        if (retryCount >= MAX_RETRIES) {
-            // 达到最大重试次数，显示正确答案
-            document.querySelectorAll('.option').forEach(opt => {
-                if (opt.dataset.correct === 'true') {
-                    opt.classList.add('correct');
-                }
-            });
-            
-            feedback.textContent = `${step.feedbackIncorrect}\n\n您已尝试 ${MAX_RETRIES} 次，正确答案已显示。`;
-            
-            // 禁用所有选项
-            document.querySelectorAll('.option').forEach(opt => {
-                opt.classList.add('disabled');
-            });
-            
-            // 保存错误答案（标记为需要重新学习）
-            userAnswers[currentStep - 1] = optionId;
-            localStorage.setItem('removeAnswers', JSON.stringify(userAnswers));
-            
-            // 启用下一步按钮
-            nextBtn.disabled = false;
-            answered = true;
-        } else {
-            // 还可以重试，不显示正确答案
-            feedback.textContent = `${step.feedbackIncorrect}\n\n请重新选择正确答案 (剩余尝试次数: ${MAX_RETRIES - retryCount})`;
-            
-            // 添加重新作答按钮
-            addRetryButton();
-            
-            // 标记错误选项
-            optionElement.classList.add('incorrect');
-            
-            // 保存临时答案（不保存到本地存储）
-            userAnswers[currentStep - 1] = optionId;
-        }
+        userAnswers[currentStep - 1] = optionId;
+        localStorage.setItem('wearAnswers', JSON.stringify(userAnswers));
         
-        feedback.style.display = 'block';
+        nextBtn.disabled = false;
+        answered = true;
+    } else {
+        // 前2次答错：只提示错误，不显示答案
+        const remainingTries = MAX_RETRIES - retryCount;
+        feedback.textContent = `❌ 回答错误！请重新选择正确答案。 (剩余尝试次数: ${remainingTries})`;
+        
+        addRetryButton();
+        optionElement.classList.add('incorrect');
+        userAnswers[currentStep - 1] = optionId;
     }
+    
+    feedback.style.display = 'block';
+}
 }
 
 // 添加重新作答按钮
@@ -631,6 +620,10 @@ function showCompletionMessage() {
     completionMessage.innerHTML = `
         <h3><i class="fas fa-trophy"></i> 恭喜完成！</h3>
         <p>您已成功完成脱防护服的所有学习步骤。</p>
+         <!-- 添加流程图 -->
+    <div style="margin: 15px 0; text-align: center;">
+        <img src="/microbiology_experiment/images/wear/remove.png" alt="脱防护服流程图" style="max-width: 100%; border-radius: 10px;">
+    </div>
         <p>最终得分: <strong>${score}</strong>/100</p>
         <p>用时: <strong>${minutes}分${seconds}秒</strong></p>
         <p>您已掌握脱防护服的关键步骤和要点。</p>
